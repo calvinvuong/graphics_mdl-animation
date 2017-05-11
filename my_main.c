@@ -72,8 +72,35 @@ void first_pass() {
   //in order to use name and num_frames
   //they must be extern variables
   extern int num_frames;
-  extern char name[128]; 
+  extern char name[128];
 
+  int frame_found = 0; // 0 if frame command absent, 1 if present
+  int basename_found = 0; // 0 if basename command absent, 1 if present
+  int vary_found = 0; // 0 if vary command absent, 1 if present
+  
+  int i;
+  for ( i = 0; i < lastop; i++ ) {
+    if ( op[i].opcode == FRAMES ) {
+      num_frames = op[i].op.frames.num_frames;
+      frame_found += 1;
+    }
+    else if ( op[i].opcode == BASENAME ) {
+      strcpy(name, op[i].op.basename.p->name);
+      basename_found += 1;
+    }
+    else if ( op[i].opcode == VARY ) {
+      vary_found += 1;
+    }
+  }
+
+  if ( vary_found && !frame_found ) {
+    printf("You are varying a value without any frames. Exiting program...\n");
+    exit(0);
+  }
+  else if ( frame_found && !basename_found ) {
+    strcpy(name, "animation");
+    printf("Basename not defined. Set to 'animation' as default.\n");
+  }
   return;
 }
 
