@@ -109,7 +109,7 @@ void first_pass() {
   Returns: An array of vary_node linked lists
 
   In order to set the knobs for animation, we need to keep
-  a seaprate value for each knob for each frame. We can do
+  a separate value for each knob for each frame. We can do
   this by using an array of linked lists. Each array index
   will correspond to a frame (eg. knobs[0] would be the first
   frame, knobs[2] would be the 3rd frame and so on).
@@ -126,7 +126,31 @@ void first_pass() {
   jdyrlandweaver
   ====================*/
 struct vary_node ** second_pass() {
-  return NULL;
+  struct vary_node * array[num_frames];
+  /*
+  struct vary_node {
+  
+  char name[128];
+  double value;
+  struct vary_node *next;
+};
+  */
+  int i;
+  for ( i = 0; i < lastop; i++ ) {
+    if ( op[i].opcode == VARY ) {
+      int start_frame = op[i].op.vary.start_frame;
+      int end_frame = op[i].op.vary.end_frame;
+      double step = (op[i].op.vary.end_val - op[i].op.vary.start_val) / (op[i].op.vary.end_frame - op[i].op.vary.start_frame);
+      double vary_value = 0;
+      
+      int j;
+      for ( j = start_frame; j < end_frame; j++ ) {
+	struct vary_node * node = malloc(sizeof(vary_node));
+	strcpy(node->name, op[i].op.vary.p->name);
+	node->value = vary_value += step; 
+    }
+  }
+  return *array;
 }
 
 
