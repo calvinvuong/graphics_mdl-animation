@@ -126,7 +126,8 @@ void first_pass() {
   jdyrlandweaver
   ====================*/
 struct vary_node ** second_pass() {
-  struct vary_node * array[num_frames];
+  //struct vary_node ** array = malloc(sizeof(struct vary_node *));
+  struct vary_node * array[200];
   /*
   struct vary_node {
   
@@ -135,22 +136,32 @@ struct vary_node ** second_pass() {
   struct vary_node *next;
 };
   */
-  int i;
-  for ( i = 0; i < lastop; i++ ) {
-    if ( op[i].opcode == VARY ) {
-      int start_frame = op[i].op.vary.start_frame;
-      int end_frame = op[i].op.vary.end_frame;
-      double step = (op[i].op.vary.end_val - op[i].op.vary.start_val) / (op[i].op.vary.end_frame - op[i].op.vary.start_frame);
-      double vary_value = 0;
-      
-      int j;
-      for ( j = start_frame; j < end_frame; j++ ) {
-	struct vary_node * node = malloc(sizeof(vary_node));
+  int frame, i;
+  for ( frame = 0; frame < num_frames; frame++ ) {
+    struct vary_node * top_node = NULL;
+
+    for ( i = 0; i < lastop; i++ ) {
+      if ( op[i].opcode == VARY &&
+	   op[i].op.vary.start_frame <= frame &&
+	   op[i].op.vary.end_frame >= frame ) {
+	int start_frame = op[i].op.vary.start_frame;
+	int end_frame = op[i].op.vary.end_frame;
+	double percent = (frame - start_frame) / (end_frame - start_frame); // percent of the transformation completed at this frame
+	
+	struct vary_node * node = (struct vary_node *) malloc(sizeof(struct vary_node));
+	
 	strcpy(node->name, op[i].op.vary.p->name);
-	node->value = vary_value += step; 
-    }
-  }
-  return *array;
+	node->value = op[i].op.vary.start_val + percent * (op[i].op.vary.end_val - op[i].op.vary.start_val);
+	node->next = top_node;
+	  
+	top_node = node;
+      }
+    } // end loop through operations
+
+    array[frame] = top_node;
+  } //end loop through num_frames
+  //return array;
+  return array;
 }
 
 
