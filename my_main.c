@@ -126,8 +126,8 @@ void first_pass() {
   jdyrlandweaver
   ====================*/
 struct vary_node ** second_pass() {
-  //struct vary_node ** array = malloc(sizeof(struct vary_node *));
-  struct vary_node * array[200];
+  struct vary_node ** array = malloc(sizeof(struct vary_node *) * num_frames);
+  
   /*
   struct vary_node {
   
@@ -139,15 +139,15 @@ struct vary_node ** second_pass() {
   int frame, i;
   for ( frame = 0; frame < num_frames; frame++ ) {
     struct vary_node * top_node = NULL;
-
     for ( i = 0; i < lastop; i++ ) {
       if ( op[i].opcode == VARY &&
 	   op[i].op.vary.start_frame <= frame &&
 	   op[i].op.vary.end_frame >= frame ) {
+
 	int start_frame = op[i].op.vary.start_frame;
 	int end_frame = op[i].op.vary.end_frame;
-	double percent = (frame - start_frame) / (end_frame - start_frame); // percent of the transformation completed at this frame
-	
+	float percent = (frame - start_frame) / (double) (end_frame - start_frame); // percent of the transformation completed at this frame
+
 	struct vary_node * node = (struct vary_node *) malloc(sizeof(struct vary_node));
 	
 	strcpy(node->name, op[i].op.vary.p->name);
@@ -237,13 +237,21 @@ void my_main() {
   g.green = 0;
   g.blue = 0;
 
+  first_pass();
+  struct vary_node ** array = second_pass();
+  int a;
+  for ( a = 0; a < num_frames; a++ ) {
+    printf("%s: %f\n", array[a]->name, array[a]->value);
+  }
+
+
   for (i=0;i<lastop;i++) {
 
     printf("%d: ",i);
-      switch (op[i].opcode)
-	{
-	case SPHERE:
-	  printf("Sphere: %6.2f %6.2f %6.2f r=%6.2f",
+    switch (op[i].opcode)
+       {
+       case SPHERE:
+	 printf("Sphere: %6.2f %6.2f %6.2f r=%6.2f",
 		 op[i].op.sphere.d[0],op[i].op.sphere.d[1],
 		 op[i].op.sphere.d[2],
 		 op[i].op.sphere.r);
