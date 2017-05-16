@@ -14,19 +14,19 @@
   pop: remove the top matrix on the origin stack
 
   move/scale/rotate: create a transformation matrix 
-                     based on the provided values, then 
-		     multiply the current top of the
-		     origins stack by it.
+  based on the provided values, then 
+  multiply the current top of the
+  origins stack by it.
 
   box/sphere/torus: create a solid object based on the
-                    provided values. Store that in a 
-		    temporary matrix, multiply it by the
-		    current top of the origins stack, then
-		    call draw_polygons.
+  provided values. Store that in a 
+  temporary matrix, multiply it by the
+  current top of the origins stack, then
+  call draw_polygons.
 
   line: create a line based on the provided values. Store 
-        that in a temporary matrix, multiply it by the
-	current top of the origins stack, then call draw_lines.
+  that in a temporary matrix, multiply it by the
+  current top of the origins stack, then call draw_lines.
 
   save: call save_extension with the provided filename
 
@@ -128,14 +128,6 @@ void first_pass() {
 struct vary_node ** second_pass() {
   struct vary_node ** array = malloc(sizeof(struct vary_node *) * num_frames);
   
-  /*
-  struct vary_node {
-  
-  char name[128];
-  double value;
-  struct vary_node *next;
-};
-  */
   int frame, i;
   for ( frame = 0; frame < num_frames; frame++ ) {
     struct vary_node * top_node = NULL;
@@ -166,14 +158,14 @@ struct vary_node ** second_pass() {
 
 
 /*======== void print_knobs() ==========
-Inputs:   
-Returns: 
+  Inputs:   
+  Returns: 
 
-Goes through symtab and display all the knobs and their
-currnt values
+  Goes through symtab and display all the knobs and their
+  currnt values
 
-jdyrlandweaver
-====================*/
+  jdyrlandweaver
+  ====================*/
 void print_knobs() {
   
   int i;
@@ -238,20 +230,21 @@ void my_main() {
   g.blue = 0;
 
   first_pass();
+  // diagnostic for second pass
   struct vary_node ** array = second_pass();
   int a;
   for ( a = 0; a < num_frames; a++ ) {
     printf("%s: %f\n", array[a]->name, array[a]->value);
   }
 
-
-  for (i=0;i<lastop;i++) {
-
-    printf("%d: ",i);
-    switch (op[i].opcode)
-       {
-       case SPHERE:
-	 printf("Sphere: %6.2f %6.2f %6.2f r=%6.2f",
+  if ( num_frames <= 1) {
+    for (i=0;i<lastop;i++) {
+      
+      printf("%d: ",i);
+      switch (op[i].opcode)
+	{
+	case SPHERE:
+	  printf("Sphere: %6.2f %6.2f %6.2f r=%6.2f",
 		 op[i].op.sphere.d[0],op[i].op.sphere.d[1],
 		 op[i].op.sphere.d[2],
 		 op[i].op.sphere.r);
@@ -401,7 +394,8 @@ void my_main() {
 	  printf("Display");
 	  display(t);
 	  break;
-    }
+	}
       printf("\n");
     }
+  }
 }
