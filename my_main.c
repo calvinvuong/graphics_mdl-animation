@@ -230,14 +230,21 @@ void my_main() {
   g.blue = 0;
 
   first_pass();
-  // diagnostic for second pass
+  
   struct vary_node ** array = second_pass();
-  int a;
-  for ( a = 0; a < num_frames; a++ ) {
-    printf("%s: %f\n", array[a]->name, array[a]->value);
-  }
 
-  if ( num_frames <= 1) {
+  if ( num_frames > 1 ) {
+    for ( i = 0; i < num_frames; i++ ) {
+      // go through linked list and set values in symbol table
+      struct vary_node * top = array[i];
+      while ( top != NULL ) {
+	set_value(lookup_symbol(top->name), top->value);
+	top = top->next;
+      } // close loop thru LL
+      print_knobs();
+    } // close loop thru frames
+  }
+  else if ( num_frames <= 1) { // replace with else
     for (i=0;i<lastop;i++) {
       
       printf("%d: ",i);
