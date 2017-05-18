@@ -235,6 +235,7 @@ void my_main() {
 
   if ( num_frames > 1 ) {
     for ( i = 0; i < num_frames; i++ ) {
+      printf("frame #: %d\n", i);
       // go through linked list and set values in symbol table
       struct vary_node * top = array[i];
       while ( top != NULL ) {
@@ -335,6 +336,7 @@ void my_main() {
 	      }
 	    break;
 	  case MOVE:
+
 	    printf("Move: %6.2f %6.2f %6.2f",
 		   op[i].op.move.d[0],op[i].op.move.d[1],
 		   op[i].op.move.d[2]);
@@ -342,11 +344,15 @@ void my_main() {
 	      {
 		printf("\tknob: %s",op[i].op.move.p->name);
 	      }
-	    
+
 	    tmp = make_translate( op[i].op.move.d[0],
 				  op[i].op.move.d[1],
 				  op[i].op.move.d[2]);
-	    scalar_mult(lookup_symbol(op[i].op.move.p->name)->s.value, tmp);
+
+	    if ( op[i].op.move.p != NULL ) // if knob present
+	      scalar_mult(lookup_symbol(op[i].op.move.p->name)->s.value, tmp);
+
+	    
 	    matrix_mult(peek(systems), tmp);
 	    copy_matrix(tmp, peek(systems));
 	    tmp->lastcol = 0;
@@ -362,7 +368,9 @@ void my_main() {
 	    tmp = make_scale( op[i].op.scale.d[0],
 			      op[i].op.scale.d[1],
 			      op[i].op.scale.d[2]);
-	    scalar_mult(lookup_symbol(op[i].op.scale.p->name)->s.value, tmp);
+	    if ( op[i].op.scale.p != NULL )
+	      scalar_mult(lookup_symbol(op[i].op.scale.p->name)->s.value, tmp);
+	    
 	    matrix_mult(peek(systems), tmp);
 	    copy_matrix(tmp, peek(systems));
 	    tmp->lastcol = 0;
@@ -383,7 +391,9 @@ void my_main() {
 	    else
 	      tmp = make_rotZ( theta );
 
-	    scalar_mult(lookup_symbol(op[i].op.scale.p->name)->s.value, tmp);
+	    if ( op[i].op.rotate.p != NULL )
+	      scalar_mult(lookup_symbol(op[i].op.rotate.p->name)->s.value, tmp);
+	    
 	    matrix_mult(peek(systems), tmp);
 	    copy_matrix(tmp, peek(systems));
 	    tmp->lastcol = 0;
@@ -406,8 +416,11 @@ void my_main() {
 	    break;
 	  }
 	printf("\n");
-	
       } // close loop thru operations
+      // reset
+      tmp->lastcol = 0;
+      systems = new_stack();
+      clear_screen(t);
     } // close loop thru frames
   } // close if num_frames > 1
   
