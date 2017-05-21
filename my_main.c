@@ -214,7 +214,7 @@ void print_knobs() {
   ====================*/
 void my_main() {
 
-  int i;
+  int i, j;
   struct matrix *tmp;
   struct stack *systems;
   screen t;
@@ -245,9 +245,8 @@ void my_main() {
       print_knobs();
 
       // perform execution
-      for (i=0;i<lastop;i++) {
+      for (j=0;j<lastop;j++) {
 	
-	printf("%d: ",i);
 	switch (op[i].opcode)
 	  {
 	  case SPHERE:
