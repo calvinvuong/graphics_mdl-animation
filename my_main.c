@@ -246,6 +246,7 @@ void my_main() {
 
       // perform execution; loop through command list
       for (j=0;j<lastop;j++) {
+	double knob_value = 1.0;
 	
 	switch (op[j].opcode)
 	  {
@@ -344,12 +345,12 @@ void my_main() {
 		printf("\tknob: %s",op[j].op.move.p->name);
 	      }
 
-	    tmp = make_translate( op[j].op.move.d[0],
-				  op[j].op.move.d[1],
-				  op[j].op.move.d[2]);
-
 	    if ( op[j].op.move.p != NULL ) // if knob present
-	      scalar_mult(lookup_symbol(op[j].op.move.p->name)->s.value, tmp);
+	      knob_value = lookup_symbol(op[j].op.move.p->name)->s.value;
+	    
+	    tmp = make_translate( op[j].op.move.d[0] * knob_value,
+				  op[j].op.move.d[1] * knob_value,
+				  op[j].op.move.d[2] * knob_value );
 
 	    matrix_mult(peek(systems), tmp);
 	    copy_matrix(tmp, peek(systems));
@@ -363,17 +364,18 @@ void my_main() {
 	      {
 		printf("\tknob: %s",op[j].op.rotate.p->name);
 	      }
+
+	    if ( op[j].op.rotate.p != NULL ) 
+	      knob_value = lookup_symbol(op[j].op.rotate.p->name)->s.value;
+
 	    theta =  op[j].op.rotate.degrees * (M_PI / 180);
 	    if (op[j].op.rotate.axis == 0 )
-	      tmp = make_rotX( theta );
+	      tmp = make_rotX( theta * knob_value );
 	    else if (op[j].op.rotate.axis == 1 )
-	      tmp = make_rotY( theta );
+	      tmp = make_rotY( theta * knob_value );
 	    else
-	      tmp = make_rotZ( theta );
-
-	    if ( op[j].op.rotate.p != NULL )
-	      scalar_mult(lookup_symbol(op[j].op.rotate.p->name)->s.value, tmp);
-	    
+	      tmp = make_rotZ( theta * knob_value );
+	    	    
 	    matrix_mult(peek(systems), tmp);
 	    copy_matrix(tmp, peek(systems));
 	    tmp->lastcol = 0;
@@ -386,11 +388,13 @@ void my_main() {
 	      {
 		printf("\tknob: %s",op[j].op.scale.p->name);
 	      }
-	    tmp = make_scale( op[j].op.scale.d[0],
-			      op[j].op.scale.d[1],
-			      op[j].op.scale.d[2]);
+
 	    if ( op[j].op.scale.p != NULL )
-	      scalar_mult(lookup_symbol(op[j].op.scale.p->name)->s.value, tmp);
+	      knob_value = lookup_symbol(op[j].op.scale.p->name)->s.value;
+
+	    tmp = make_scale( op[j].op.scale.d[0] * knob_value,
+			      op[j].op.scale.d[1] * knob_value,
+			      op[j].op.scale.d[2] * knob_value);
 	    
 	    matrix_mult(peek(systems), tmp);
 	    copy_matrix(tmp, peek(systems));
