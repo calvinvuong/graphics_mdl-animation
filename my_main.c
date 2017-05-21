@@ -400,7 +400,19 @@ void my_main() {
 	    copy_matrix(tmp, peek(systems));
 	    tmp->lastcol = 0;
 	    break;
-	  
+	  case SET:
+	    printf("Set");
+	    set_value(lookup_symbol(op[j].op.set.p->name), op[j].op.set.p->s.value);
+	    break;
+	  case SETKNOBS:
+	    printf("Set Knobs");
+	    int k;
+	    // loop through symtab and set values
+	    for ( k=0; k < lastsym; k++ ) {
+	      if ( symtab[i].type == SYM_VALUE )
+		symtab[i].s.value = op[j].op.setknobs.value;
+	    }
+	    break;
 	  case PUSH:
 	    printf("Push");
 	    push(systems);
